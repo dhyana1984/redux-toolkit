@@ -11,6 +11,7 @@ import {
 import styles from './Counter.module.css';
 
 export function Counter() {
+  // useSelector will re-render UI if selector return different state
   const count = useSelector(selectCount);
   const dispatch = useDispatch();
   const [incrementAmount, setIncrementAmount] = useState('2');
@@ -27,7 +28,7 @@ export function Counter() {
         >
           -
         </button>
-        <span className={styles.value}>{count}</span>
+        <span className={styles.value}>Global {count}</span>
         <button
           className={styles.button}
           aria-label="Increment value"

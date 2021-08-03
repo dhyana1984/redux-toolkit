@@ -2,8 +2,15 @@ import React from 'react';
 import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import './App.css';
+import { counterSlice } from './features/counter/counterSlice'
 
 function App() {
+  //slice.actions includes all the action creator functions
+  console.log(counterSlice.actions.increment())
+
+  const newState = counterSlice.reducer({ value: 10 }, counterSlice.actions.increment())
+  //slice.reducer includes the reducer function
+  console.log(newState)
   return (
     <div className="App">
       <header className="App-header">
