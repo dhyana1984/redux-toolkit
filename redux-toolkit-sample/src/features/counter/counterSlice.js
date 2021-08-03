@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchCount } from './counterAPI';
 
+//A "slice" is a collection of Redux reducer logic and actions for a single feature
+
 const initialState = {
-  value: 0,
+  value: 1,
   status: 'idle',
 };
 
@@ -20,11 +22,15 @@ export const incrementAsync = createAsyncThunk(
   }
 );
 
+//createSlice which takes care of the work of generating action type strings, action creator functions, and action objects
 export const counterSlice = createSlice({
+  // name option is used as first part of action type. "counter" in "counter/increment" is the name option here
   name: 'counter',
+  // The initial state the first time will call
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
+    //The key of the reducer fuction is the second part of action type. "increment" in "counter/increment" is the key option here
     increment: (state) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
