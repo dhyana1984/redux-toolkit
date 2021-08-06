@@ -1,33 +1,28 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { postAdded } from './postsSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { postUpdated } from './postsSlice'
 
-export const AddPostForm = () => {
-    const [title, setTitle] = useState('')
-    const [content, setContent] = useState('')
+export const EditPostForm = ({ match }) => {
+    const { postId } = match.params
+    const post = useSelector(state => state.posts.find(post => post.id === postId))
+    const [title, setTitle] = useState(post.title)
+    const [content, setContent] = useState(post.content)
     const dispatch = useDispatch()
-
+    const history = useHistory()
     const onTitleChanged = e => setTitle(e.target.value)
     const onContentChanged = e => setContent(e.target.value)
 
     const onSavePostClicked = () => {
         if (title && content) {
-            dispatch(
-                //postAdded is a action creator, the argument object is the payload for this action
-                postAdded({
-                    title,
-                    content
-                })
-            )
-
-            setTitle('')
-            setContent('')
+            dispatch(postUpdated({ id: postId, title, content }))
+            history.push(`/posts/${postId}`)
         }
     }
 
     return (
         <section>
-            <h2>Add a New Post</h2>
+            <h2>Edit Post</h2>
             <form>
                 <label htmlFor="postTitle">Post Title:</label>
                 <input
@@ -36,10 +31,10 @@ export const AddPostForm = () => {
                     name="postTitle"
                     value={title}
                     onChange={onTitleChanged}
+                    placeholder="What's on your mind?"
                 />
                 <label htmlFor="postContent">Content:</label>
-                <input
-                    type="text"
+                <textarea
                     id="postContent"
                     name="postContent"
                     value={content}
@@ -49,4 +44,5 @@ export const AddPostForm = () => {
             </form>
         </section>
     )
+
 }
