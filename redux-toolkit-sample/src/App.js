@@ -11,8 +11,19 @@ import { Navbar } from './app/Navbar'
 import { AddPostForm } from './features/posts/AddPostForm'
 import { PostsList } from './features/posts/PostsList'
 import { EditPostForm } from './features/posts/EditPostForm'
+import { useEffect } from 'react'
+
+
+
 
 function App() {
+
+  // useEffect(() => {
+  //   fetch("/fakeApi/posts")
+  //     .then((response) => response.json())
+  //     .then((json) => console.log(json))
+  // }, [])
+
   return (
     <Router>
       <Navbar />
