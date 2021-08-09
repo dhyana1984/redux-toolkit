@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
-import { sub } from 'date-fns'
+import { createAsyncThunk, createSlice, current, nanoid } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 
 const initialState = {
@@ -13,10 +12,23 @@ createAsyncThunk accepts two arguments:
 A string that will be used as the prefix for the generated action types
 A "payload creator" callback function that should return a Promise containing some data, or a rejected Promise with an error
 */
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
-    const response = await client.get('/fakeApi/posts')
-    return response.posts
-})
+export const fetchPosts = createAsyncThunk(
+    'posts/fetchPosts',
+    async () => {
+        const response = await client.get('/fakeApi/posts')
+        return response.posts
+    })
+
+export const addNewPost = createAsyncThunk(
+    'post/addNewPost',
+    // The payload creator receives the partial `{title, content, user}` object
+    async initialPost => {
+        // We send the initial data to the fake API server
+        const response = await client.post('fakeApi/posts', { post: initialPost })
+        // The response includes the complete post object, including unique ID
+        return response.post
+    }
+)
 
 const postsSlice = createSlice({
     name: 'posts',
@@ -62,12 +74,19 @@ const postsSlice = createSlice({
         //Please note that there wouldn't return any value
         [fetchPosts.pending]: (state, action) => { state.status = 'loading' },
         [fetchPosts.fulfilled]: (state, action) => {
+            //state here is a proxy object, need to use current function to display in browser
+            console.log(current(state))
             state.status = 'succeeded'
             state.posts = state.posts.concat(action.payload)
+            console.log(current(state))
         },
         [fetchPosts.rejected]: (state, action) => {
             state.status = 'failed'
             state.error = action.error.message
+        },
+        [addNewPost.fulfilled]: (state, action) => {
+            // We can directly add the new post to posts array
+            state.posts.push(action.payload)
         }
     }
 })
