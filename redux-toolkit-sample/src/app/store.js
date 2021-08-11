@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import notificationsReducer from "../features/notification/notificationSlice";
 import postsReducer from '../features/posts/postsSlice'
 import usersReducer from '../features/users/usersSlice'
 
@@ -11,6 +12,7 @@ export const store = configureStore({
         //It says that we want to have a state.counter section of our Redux state object
         // and that we want the counterReducer function to be in charge of deciding if and how to update the state.counter section whenever an action is dispatched
         posts: postsReducer,
-        users: usersReducer
+        users: usersReducer,
+        notifications: notificationsReducer
     }
 })
