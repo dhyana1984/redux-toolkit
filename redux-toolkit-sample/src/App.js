@@ -13,6 +13,7 @@ import { PostsList } from './features/posts/PostsList'
 import { EditPostForm } from './features/posts/EditPostForm'
 import { UsersList } from './features/users/UsersList'
 import { UserPage } from './features/users/UserPage'
+import { NotificationsList } from './features/notification/NotificationsList'
 // import { useEffect } from 'react'
 
 
@@ -60,6 +61,11 @@ function App() {
             exact
             path="/users/:userId"
             component={UserPage}
+          />
+          <Route
+            exact
+            path="/notifications"
+            component={NotificationsList}
           />
           <Redirect to="/" />
         </Switch>
