@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, current, nanoid } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice, current, nanoid } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 
 const initialState = {
@@ -98,3 +98,33 @@ export default postsSlice.reducer
 export const selectAllPosts = state => state.posts.posts
 
 export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+
+export const selectPostsByUser = createSelector(
+    //input selector, re-use selectAllPosts
+    [selectAllPosts, (state, userId) => userId],
+    //output selector, only when posts or userid changed, this selector will re-run
+    (posts, userId) => posts.filter(post => post.user === userId)
+)
+
+/* Example for selectPostsByUser output selector
+
+    const state1 = getState()
+    // Output selector runs, because it's the first call
+    selectPostsByUser(state1, 'user1')
+    // Output selector does _not_ run, because the arguments haven't changed
+    selectPostsByUser(state1, 'user1')
+    // Output selector runs, because `userId` changed
+    selectPostsByUser(state1, 'user2')
+
+    dispatch(reactionAdded())
+    const state2 = getState()
+    // Output selector does not run, because `posts` and `userId` are the same
+    selectPostsByUser(state2, 'user2')
+
+    // Add some more posts
+    dispatch(addNewPost())
+    const state3 = getState()
+    // Output selector runs, because `posts` has changed
+    selectPostsByUser(state3, 'user2')
+
+ */
