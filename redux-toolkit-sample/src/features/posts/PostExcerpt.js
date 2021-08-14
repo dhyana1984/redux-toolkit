@@ -4,7 +4,8 @@ import { TimeAgo } from './TimeAgo'
 import { Link } from 'react-router-dom'
 import { PostAuthor } from './PostAuthor'
 
-export const PostExcerpt = ({ post }) => {
+//Use React.memo to make sure the sub component will not recursively render
+export const PostExcerpt = React.memo(({ post }) => {
     const renderedPosts = (
         <article className="post-excerpt" key={post.id}>
             <h3>{post.title}</h3>
@@ -21,4 +22,4 @@ export const PostExcerpt = ({ post }) => {
     )
 
     return renderedPosts
-}
+})
