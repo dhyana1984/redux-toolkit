@@ -1,11 +1,18 @@
-import { createAsyncThunk, createSelector, createSlice, current, nanoid } from '@reduxjs/toolkit'
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 
-const initialState = {
-    posts: [],
+//createEntityAdapter accepts an options object that may include a sortComparer function
+//which will be used to keep the item IDs array in sorted order by comparing two items
+const postsAdapter = createEntityAdapter({
+    sortComparer: (a, b) => b.date.localeCompare(a.date)
+})
+
+//getInitialState() returns an empty {ids: [], entities: {}} normalized state object
+const initialState = postsAdapter.getInitialState({
+    // posts: [],
     status: 'idle',
     error: null
-}
+})
 
 /*
 createAsyncThunk accepts two arguments:
@@ -36,7 +43,8 @@ const postsSlice = createSlice({
     reducers: {
         reactionAdded(state, action) {
             const { postId, reaction } = action.payload
-            const existingPost = state.posts.find(post => post.id === postId)
+            // const existingPost = state.posts.find(post => post.id === postId)
+            const existingPost = state.entities[postId]
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
@@ -62,7 +70,8 @@ const postsSlice = createSlice({
         },
         postUpdated(state, action) {
             const { id, title, content } = action.payload
-            const existingPost = state.posts.find(post => post.id === id)
+            // const existingPost = state.posts.find(post => post.id === id)
+            const existingPost = state.entities[id]
             if (existingPost) {
                 existingPost.title = title
                 existingPost.content = content
@@ -75,10 +84,14 @@ const postsSlice = createSlice({
         [fetchPosts.pending]: (state, action) => { state.status = 'loading' },
         [fetchPosts.fulfilled]: (state, action) => {
             //state here is a proxy object, need to use current function to display in browser
-            console.log(current(state))
+            // console.log(current(state))
             state.status = 'succeeded'
-            state.posts = state.posts.concat(action.payload)
-            console.log(current(state))
+            // state.posts = state.posts.concat(action.payload)
+
+            // Use the `upsertMany` reducer as a mutating update ulility
+            // If there's any items in action.payload that already existing in our state
+            //the upsertMany function will merge them together based on matching IDs.
+            postsAdapter.upsertMany(state, action.payload)
         },
         [fetchPosts.rejected]: (state, action) => {
             state.status = 'failed'
@@ -86,7 +99,8 @@ const postsSlice = createSlice({
         },
         [addNewPost.fulfilled]: (state, action) => {
             // We can directly add the new post to posts array
-            state.posts.push(action.payload)
+            // state.posts.push(action.payload)
+            postAdded.addOne(state, action)
         }
     }
 })
@@ -95,9 +109,17 @@ export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
 
-export const selectAllPosts = state => state.posts.posts
+// export const selectAllPosts = state => state.posts.posts
 
-export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+// export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+
+// Export the customized selectors for this adapter using `getSelectors`
+export const {
+    selectAll: selectAllPosts,
+    selectById: selectPostById,
+    selectIds: selectPostIds
+
+} = postsAdapter.getSelectors(state => state.posts)
 
 export const selectPostsByUser = createSelector(
     //input selector, re-use selectAllPosts
